@@ -1,0 +1,84 @@
+Modificaciones a algunos scripts de live-build v4.0.3 en /usr/lib/live/build
+****************************************************************************
+por 4rkng3l Julio 2016
+
+
+binary_hdd (para la creación de archivos .img en lugar de .iso)
+==========
+Este archivo controla la creación de la imágen tipo archivo.img (hdd), aquí se agrega la siguiente condición alrededor de la línea 195:
+
+# Arreglo 12 Jun 2016 - 4rkng3l
+if [ -d chroot/usr/lib/SYSLINUX ]
+then
+	dd if=chroot/usr/lib/SYSLINUX/mbr.bin of=${FREELO} bs=440 count=1
+else
+	dd if=chroot/usr/lib/${_BOOTLOADER}/mbr.bin of=${FREELO} bs=440 count=1
+fi
+
+...esta condición está anidada dentro de otro if que pregunta por el bootloader y en función de si es syslinux o no hace algo..., la opción original es la que esta por else, yo agregue la que esta por if, preguntando si esiste el directorio SYSLINUX (en mayúsucla!!), y se repite la condición agregada al rededor de la línea 210.
+
+Y se agrega la extensiòn img al archivo resultante del comando mv en la 348, quedando así el nuevo comando:
+
+#mv chroot/binary.img ${LIVE_IMAGE_NAME}-${LIVE_IMAGE_ARCHITECTURE}
+mv chroot/binary.img ${LIVE_IMAGE_NAME}-${LIVE_IMAGE_ARCHITECTURE}.img
+
+binary_iso
+==========
+Se modifico el valor de la variable XORRISO_OPTIONS, la cual queda comentada en su forma original y se agrega al final de la misma los parámetros "-eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot -isohybrid-gpt-basdat", quedando la línea 148 de la siguiente forma:
+
+#XORRISO_OPTIONS="${XORRISO_OPTIONS} -no-emul-boot -boot-load-size 4 -boot-info-table"
+## Agregado 14 Jun 2016 by 4rkng3l Soporte EFI
+XORRISO_OPTIONS="${XORRISO_OPTIONS} -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot -isohybrid-gpt-basdat"
+
+bootstrap_archives y chroot_archives
+====================================
+En ambos archivos se modifican las líneas que contienen la palabra aptitude, dejando de la siguiente forma:
+
+#if [ "${LB_APT}" = "aptitude" ] && [ ! -x /usr/bin/aptitude ]
+#then
+	Chroot chroot "apt-get ${APT_OPTIONS} update"
+	Chroot chroot "apt-get ${APT_OPTIONS} install aptitude"
+	Chroot chroot "apt-get ${APT_OPTIONS} install apt-transport-https"
+#fi
+
+...esto es, comentando la condición y agregando la instalaciòn de apt-transport-https, para poder instalar aplicaciones con https en sources.list
+
+
+++++++++++++++++++++++++++++
++ Construcción base Devuan +
+++++++++++++++++++++++++++++
+
+Asegurarse que los paquetes live-build y debootstrap sean del proyecto Devuan:
+
+Paquete: live-build                              
+Estado: instalado
+Instalado automáticamente: no
+Versión: 4.0.3-1+devuan2
+Prioridad: opcional
+Sección: misc
+Desarrollador: Frits Daalmans <frits@daalmansdata.eu>
+Arquitectura: all
+Tamaño sin comprimir: 929 k
+Depende de: debootstrap | cdebootstrap | cdebootstrap-static
+Recomienda: cpio, live-boot-doc, live-config-doc, live-manual-html | live-manual
+Descripción: Live System Build Components
+ The Live Systems project maintains the components to build Debian based Live systems and the official Debian Live images themselves. 
+ 
+ live-build contains the components to build a live system from a configuration directory.
+Página principal: http://live-systems.org/devel/live-build/
+
+
+Paquete: debootstrap                             
+Estado: instalado
+Instalado automáticamente: no
+Versión: 1.0.75-1+devuan1
+Prioridad: extra
+Sección: admin
+Desarrollador: Franco (nextime) Lanza <nextime@devuan.org>
+Arquitectura: all
+Tamaño sin comprimir: 249 k
+Depende de: wget
+Recomienda: gnupg, devuan-keyring
+Descripción: Bootstrap a basic Devuan system
+ debootstrap is used to create a Devuan base system from scratch, without requiring the availability of dpkg or apt. It does this by
+ downloading .deb files from a mirror site, and carefully unpacking them into a directory which can eventually be chrooted into.
