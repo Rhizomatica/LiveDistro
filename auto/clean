@@ -1,0 +1,56 @@
+#!/bin/sh
+
+set -e
+
+DISBASE=$(lsb_release -d | awk '{print $2}')
+#######################
+
+lb clean noauto "${@}"
+
+## Limpiando configs y log
+rm -f config/binary config/bootstrap config/chroot config/common config/source config/build
+rm -f build.log
+
+## Limpia archivos de AQUItectura de kernel
+rm -f config/package-lists/kernel.list.chroot
+
+## Borra directorios con archivos comúnes sea DISBASE Debian o Devuan
+if [ -d config/archives ]
+then
+	rm -rf config/archives
+fi
+
+if [ -d config/package-lists ]
+then
+	rm -rf config/package-lists
+fi
+
+if [ -d config/packages.binary ]
+then
+	rm -rf config/packages.binary
+fi
+
+if [ -d config/packages.chroot ]
+then
+	rm -rf config/packages.chroot
+fi
+
+if [ -f config/hooks/0500-rhizomatica.hook.chroot ]
+then
+	rm -rf config/hooks/*-rhizomatica.hook.chroot
+fi
+
+if [ -d config/includes.installer ]
+then
+	rm -rf config/includes.installer
+fi
+
+## Borra isolinux o syslinux
+if [ -d config/includes.binary/syslinux ]
+then
+	rm -rf config/includes.binary/syslinux
+	sed -i 's/syslinux/isolinux/g' config/includes.binary/boot/grub/theme/1
+	sed -i 's/syslinux/isolinux/g' config/includes.binary/boot/grub/grub.cfg
+else
+	rm -rf config/includes.binary/isolinux
+fi

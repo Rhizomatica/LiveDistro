@@ -1,0 +1,65 @@
+#!/bin/bash
+
+set -e
+
+ARQUI="amd64"
+DISBASE=$(lsb_release -d | awk '{print $2}')
+#########
+
+BUILD_DATE=`date`
+BUILD_TIMESTAMP=`date +%Y%m%d%H%M`
+#BUILD_VERSION="standart-"$BUILD_TIMESTAMP
+BUILD_VERSION=$BUILD_TIMESTAMP
+
+if [ $DISBASE = "Debian" ]
+then
+	#DISTRO="rhizobsc-BETA-0.6.1-debian"
+	DISTRO="rhizobsc-1.0-debian"
+else
+	#DISTRO="rhizobsc-BETA-0.6.1-devuan"
+	DISTRO="rhizobsc-1.0-devuan"
+fi
+
+PROJECT_NAME=$DISTRO
+
+## Archivo BUILD
+echo "Versión: $BUILD_VERSION" > config/includes.binary/BUILD
+echo $BUILD_DATE >> config/includes.binary/BUILD
+cp -vf config/includes.binary/BUILD config/includes.chroot/BUILD
+
+lb build noauto "${@}" 2>&1 | tee build.log
+if [ -f live-image-$ARQUI.hybrid.iso -o -f live-image-$ARQUI.iso -o -f live-image-$ARQUI.img ]
+then
+	if [ -f live-image-$ARQUI.hybrid.iso ]
+	then
+		mv live-image-$ARQUI.hybrid.iso $PROJECT_NAME-$BUILD_VERSION.iso
+	elif [ -f live-image-$ARQUI.iso ]
+	then
+		mv live-image-$ARQUI.iso $PROJECT_NAME-$BUILD_VERSION.iso
+	else
+		mv live-image-$ARQUI.img $PROJECT_NAME-$BUILD_VERSION.img
+	fi
+	mv live-image-$ARQUI.contents $PROJECT_NAME-$BUILD_VERSION.contents
+	mv live-image-$ARQUI.packages $PROJECT_NAME-$BUILD_VERSION.packages
+	mv live-image-$ARQUI.files $PROJECT_NAME-$BUILD_VERSION.files
+	mv chroot.files $PROJECT_NAME-$BUILD_VERSION.chroot.files
+	mv chroot.packages.install $PROJECT_NAME-$BUILD_VERSION.chroot.packages.install
+	mv chroot.packages.live $PROJECT_NAME-$BUILD_VERSION.chroot.packages.live
+	mv build.log $PROJECT_NAME-$BUILD_VERSION.build.log
+	if [ -f $PROJECT_NAME-$BUILD_VERSION.iso ]
+	then
+		md5sum $PROJECT_NAME-$BUILD_VERSION.iso > $PROJECT_NAME-$BUILD_VERSION.iso.md5
+		sha256sum $PROJECT_NAME-$BUILD_VERSION.iso > $PROJECT_NAME-$BUILD_VERSION.iso.sha256
+	else
+		md5sum $PROJECT_NAME-$BUILD_VERSION.img > $PROJECT_NAME-$BUILD_VERSION.img.md5
+		sha256sum $PROJECT_NAME-$BUILD_VERSION.img > $PROJECT_NAME-$BUILD_VERSION.img.sha256
+	fi
+else
+	test -f live-image-$ARQUI.contents && mv live-image-$ARQUI.contents $PROJECT_NAME-$BUILD_VERSION.contents.error
+	test -f live-image-$ARQUI.packages && mv live-image-$ARQUI.packages $PROJECT_NAME-$BUILD_VERSION.packages.error
+	test -f build.log && mv build.log $PROJECT_NAME-$BUILD_VERSION.build.log.error
+	test -f live-image-$ARQUI.files && mv live-image-$ARQUI.files $PROJECT_NAME-$BUILD_VERSION.files.error
+	test -f chroot.files && mv chroot.files $PROJECT_NAME-$BUILD_VERSION.chroot.files.error
+	test -f chroot.packages.install && mv chroot.packages.install $PROJECT_NAME-$BUILD_VERSION.chroot.packages.install.error
+	test -f chroot.packages.live && mv chroot.packages.live $PROJECT_NAME-$BUILD_VERSION.chroot.packages.live.error
+fi

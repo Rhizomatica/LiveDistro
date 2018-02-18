@@ -1,0 +1,107 @@
+#!/bin/bash
+
+set -e
+
+## Declaración de Variables propias para Rhizomatica
+PAQUETES="/home/operador/datos/rhizomatica/rhizobsc/paquetes"
+DISBASE=$(lsb_release -d | awk '{print $2}')
+
+## Declaración de Variables para live-build
+ARQUI="amd64"
+APTFORMA="aptitude"
+AREAS="main contrib non-free"
+RAMADEB="jessie"
+COMPRE="bzip2"
+SUMA="sha256"
+TASKSEL="aptitude"
+IB="iso-hybrid"
+
+## Copia directorios con archivos comúnes sea DISBASE Debian o Devuan
+cp -ra $PAQUETES/archives config/
+cp -ra $PAQUETES/package-lists config/
+cp -ra $PAQUETES/packages.chroot config/
+cp -ra $PAQUETES/packages.binary-$ARQUI config/packages.binary
+cp -ra $PAQUETES/includes.installer config/
+cp -a $PAQUETES/*-rhizomatica.hook.chroot config/hooks/
+
+## Si la imagen a construir es hdd usa syslinux sino isolinux para iso-hybrid
+if [ $IB = "hdd" ]
+then
+	cp -ar $PAQUETES/iso-sys-linux/ config/includes.binary/syslinux
+	sed -i 's/isolinux/syslinux/g' config/includes.binary/boot/grub/theme/1
+	sed -i 's/isolinux/syslinux/g' config/includes.binary/boot/grub/grub.cfg
+else
+	cp -ar $PAQUETES/iso-sys-linux/ config/includes.binary/isolinux
+fi
+
+## Acción según sea la Distribución Base sobre la que se construye Debian o Devuan
+if [ $DISBASE = "Debian" ]
+then
+	INIT="systemd"
+	LLAVEDISTRO="debian-archive-keyring"
+	#cp -a $PAQUETES/debian-backports.list config/archives/
+	#cp -a $PAQUETES/debian-backports.pref config/archives/
+	echo -e "live-config-systemd" >> config/package-lists/live.list.chroot
+	MIRROR="http://ftp.debian.org/debian/"
+	MIRROR_SECURITY="http://security.debian.org/"
+	mv config/includes.binary/isolinux/splash-db.png config/includes.binary/isolinux/splash.png
+else
+	INIT="sysvinit"
+	LLAVEDISTRO="devuan-keyring"
+	#cp -a $PAQUETES/devuan-backports.list config/archives/
+	#cp -a $PAQUETES/devuan-backports.pref config/archives/
+	echo -e "live-config-sysvinit" >> config/package-lists/live.list.chroot
+	cp -a $PAQUETES/devuan-usr-bin/* config/includes.chroot/usr/bin/
+	MIRROR="http://auto.mirror.devuan.org/merged/"
+	MIRROR_SECURITY="http://auto.mirror.devuan.org/merged/"
+	mv config/includes.binary/isolinux/splash-dv.png config/includes.binary/isolinux/splash.png
+fi
+
+## Kernel y otros paquetes...
+cp -a $PAQUETES/$ARQUI/* config/packages.chroot/
+echo -e "linux-image-amd64" > config/package-lists/kernel.list.chroot
+echo -e "linux-headers-amd64" >> config/package-lists/kernel.list.chroot
+
+## Configuración live-build según las variables antes declaradas...
+lb config noauto \
+	--architectures $ARQUI \
+	--apt $APTFORMA \
+	--archive-areas $AREAS \
+	--apt-recommends false \
+	--apt-source-archives false \
+	--apt-indices false \
+	-b $IB \
+	--backports false \
+	--cache true \
+	--checksums $SUMA \
+	--compression $COMPRE \
+	--clean \
+	--debian-installer live \
+	--debian-installer-gui true \
+	--distribution $RAMADEB \
+	--firmware-binary true \
+	--firmware-chroot true \
+	--initramfs-compression $COMPRE \
+	--initsystem $INIT \
+	--iso-application 'RhizoBSC GNU/Linux' \
+	--iso-publisher 'RhizoBSC GNU/Linux; https://www.rhizomatica.org/; contacto@rhizomatica.org' \
+	--iso-volume 'RhizoBSC GNU/Linux' \
+	-k 'amd64' \
+	--keyring-packages $LLAVEDISTRO \
+	--loadlin false \
+	--memtest "memtest86+" \
+	--mirror-bootstrap $MIRROR \
+	--mirror-chroot $MIRROR \
+	--mirror-chroot-security $MIRROR_SECURITY \
+	--mirror-binary $MIRROR \
+	--mirror-binary-security $MIRROR_SECURITY \
+	--mirror-debian-installer $MIRROR \
+	--parent-mirror-bootstrap $MIRROR \
+	--parent-mirror-chroot $MIRROR \
+	--parent-mirror-chroot-security $MIRROR_SECURITY \
+	--security true \
+	--tasksel $TASKSEL \
+	--updates true \
+	--win32-loader false \
+	--zsync true \
+	"${@}"
