@@ -1,0 +1,3 @@
+Package: python-python-esl*
+Pin: origin "repo.rhizomatica.org"
+Pin-Priority: 600

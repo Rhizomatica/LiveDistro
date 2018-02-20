@@ -1,0 +1,7 @@
+Package: lcr*
+Pin: origin "dev.rhizomatica.org"
+Pin-Priority: 600
+
+Package: lcr*
+Pin: release n=jessie
+Pin-Priority: -1

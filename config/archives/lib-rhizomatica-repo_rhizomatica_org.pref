@@ -1,0 +1,11 @@
+Package: libsmpp34*
+Pin: origin "repo.rhizomatica.org"
+Pin-Priority: 600
+
+Package: libortp*
+Pin: origin "repo.rhizomatica.org"
+Pin-Priority: 600
+
+Package: python-python-smpplib*
+Pin: origin "repo.rhizomatica.org"
+Pin-Priority: 600

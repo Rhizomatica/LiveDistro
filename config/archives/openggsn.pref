@@ -1,0 +1,3 @@
+Package: openggsn*
+Pin: origin "repo.rhizomatica.org"
+Pin-Priority: 600

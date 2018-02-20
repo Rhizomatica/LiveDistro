@@ -1,0 +1,3 @@
+Package: python-gsm0338*
+Pin: origin "repo.rhizomatica.org"
+Pin-Priority: 600

@@ -1,0 +1,3 @@
+Package: tinc*
+Pin: origin "dev.rhizomatica.org"
+Pin-Priority: 600
