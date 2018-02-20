@@ -1,0 +1,175 @@
+#!/bin/sh
+set -e
+
+ARCHLOG="bind_check.log monitor_amp.log monitor_rapi.log"
+DIRLOG="osmocom freeswitch kiwi lcr osmo-nitb rapi smpp"
+BD="rhizomatica"
+UBD="rhizomatica"
+PUBD="prueba"
+
+#-- Función para configurar NIC de la BTS
+NICBTS(){
+#cp /etc/network/interfaces /etc/network/interfaces-bak-rhizo
+cat << EOF > /etc/network/interfaces
+
+# Loopback interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto eth0
+allow-hotplug eth0
+iface eth0 inet dhcp
+
+# The secondary network interface
+auto eth1
+allow-hotplug eth1
+iface eth1 inet static
+	address	172.16.0.1
+	netmask	255.255.255.0
+	network	172.16.0.0
+EOF
+}
+#--
+
+echo " ***********************************************************"
+echo " Quitando componentes de XFCE4 que no se usarán.."
+echo " aptitude remove -y ristretto"
+#aptitude remove -y xarchiver ristretto
+aptitude remove -y ristretto
+echo
+echo " ***********************************************************"
+echo
+echo " ## Configurar crontab"
+chown 1000.crontab /var/spool/cron/crontabs/rhizomatica
+chmod 600 /var/spool/cron/crontabs/rhizomatica
+echo
+echo " ***********************************************************"
+echo
+echo " ## Configuración sudo..."
+chown root.root /etc/sudoers
+chmod 440 /etc/sudoers
+echo
+echo " ***********************************************************"
+echo
+echo " ## Configurar archivos /usr/lib/freeswitch/mod/mod_*.so..." 
+chown root.root /usr/lib/freeswitch/mod/mod_*.so
+chmod 444 /usr/lib/freeswitch/mod/mod_*.so
+echo
+echo " ***********************************************************"
+echo
+echo " ## Configurar directorio /etc/freeswitch..." 
+chown root.root /etc/freeswitch/ -R
+chown freeswitch.freeswitch /var/run/freeswitch/ -R
+echo
+echo " ***********************************************************"
+echo
+echo " ## Propiedad del los archivos de sonido de freeswitch..." 
+chown freeswitch.freeswitch -R /usr/share/freeswitch/sounds/en/*
+echo
+echo " ***********************************************************"
+echo
+echo " ## Configurar directorio /etc/sv..." 
+chown root.root /etc/sv/ -R
+echo
+echo " ***********************************************************"
+echo
+echo " ## Configurando cron..." 
+chown root.root /etc/cron.d/rhizomatica
+chmod 644 /etc/cron.d/rhizomatica
+echo
+echo " ***********************************************************"
+echo
+echo " ## Configurando /etc/default..." 
+chown root.root /etc/default/lcr
+chmod 644 /etc/default/lcr
+echo
+echo " ***********************************************************"
+echo
+echo " ## Configurar rccn..."
+chown root.staff /var/rhizomatica -R
+chmod 775 /var/rhizomatica/ -R
+echo
+echo " ***********************************************************"
+echo
+echo " ## Creando Enlaces Simbólicos en /var/www/html/..."
+ln -s /var/rhizomatica/rai /var/www/html/rai
+ln -s /var/rhizomatica/rrd/graphs /var/www/html/rai/graphs
+echo
+echo " ***********************************************************"
+echo
+echo " ## Agregando repo de NodeJS y llave..."
+echo "deb https://deb.nodesource.com/node_0.10 jessie main" > /etc/apt/sources.list.d/nodesource.list
+apt-key add /opt/nodesource.key
+echo
+echo " ***********************************************************"
+echo
+echo " ## Agregando llave del repo de Freeswitch..."
+apt-key add /opt/freeswitch_archive_g0.pub 
+echo
+echo " ***********************************************************"
+echo
+echo " ## Modificando /etc/init.d/freeswitch"
+sed -i 's/\"-u freeswitch -g freeswitch -nc\"/'\"-nc\"'/' /etc/init.d/freeswitch
+echo
+echo " ***********************************************************"
+echo
+echo " ## Permisos en /etc/rc.local"
+chmod 755 /etc/rc.local
+echo
+echo " ***********************************************************"
+echo
+echo " ## Enlaces simbolicos para sv..."
+ln -s /etc/sv/freeswitch /etc/service/
+ln -s /etc/sv/lcr /etc/service/
+ln -s /etc/sv/osmo-nitb /etc/service/
+ln -s /etc/sv/rapi /etc/service/
+echo
+echo " ***********************************************************"
+echo
+echo " ## Enlaces ESL.py y ESL.pyc..."
+ln -s /usr/lib/python2.7/dist-packages/ESL.py /usr/local/lib/python2.7/dist-packages/
+ln -s /usr/lib/python2.7/dist-packages/ESL.pyc /usr/local/lib/python2.7/dist-packages/
+echo
+echo " ***********************************************************"
+echo
+echo " ## Configurando permisos y propiedad de archivos para gestiónde log's..."
+for ARCHIVOS in $ARCHLOG
+do
+	if [ -f /var/log/$ARCHIVOS ];
+	then
+		echo "	-> Modificando /var/log/"$ARCHIVOS
+	else
+		echo "	-> Creando archivo /var/log/"$ARCHIVOS
+		touch /var/log/$ARCHIVOS
+	fi
+	chown 1000.1000 /var/log/$ARCHIVOS
+done
+for DIRECTORIOS in $DIRLOG
+do
+	if [ -d /var/log/$DIRECTORIOS ];
+	then
+		echo "	-> Modificando directorio /var/log/"$DIRECTORIOS
+	else
+		echo "	-> Creando directorio /var/log/"$DIRECTORIOS
+		mkdir /var/log/$DIRECTORIOS
+	fi
+	chown root.1000 /var/log/$DIRECTORIOS -R
+	chmod 775 /var/log/$DIRECTORIOS -R
+done
+echo
+echo " ***********************************************************"
+echo
+echo " -> Desactivando servicios del inicio en modo vivo..."
+DESACSRVS="cups smartmontools slim"
+for SRVD0 in $DESACSRVS
+do
+	if [ -h /etc/rc2.d/*$SRVD0* ]
+	then
+		SRVD1=$(ls /etc/rc2.d/*$SRVD0* | cut -d "/" -f 4 | cut -d "S" -f 2)
+		mv /etc/rc2.d/S$SRVD1 /etc/rc2.d/K$SRVD1
+		echo " -> Desactivando "$SRVD0
+	fi
+done
+echo " ***********************************************************"
+echo
