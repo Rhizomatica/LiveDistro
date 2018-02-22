@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=Instalar RhizoBSC GNU/Linux en tu disco
+Comment=Instalar RhizoBSC GNU/Linux permanentemente en tu disco
+Name[pt_BR]=Instalar RhizoBSC GNU/Linux em seu disco
+Comment[pt_BR]=Instalar RhizoBSC GNU/Linux em seu disco rígido permanentemente
+Exec=su-to-root -X -c /usr/sbin/debian-installer-launcher
+Icon=/usr/share/backgrounds/rhizobsc/rhizobsc-logo_rhizomatica.png
+Type=Application
+Categories=System;
+StartupNotify=true
+Terminal=false
