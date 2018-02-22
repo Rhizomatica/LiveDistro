@@ -15,7 +15,7 @@ This is a Live ISO based on Debian 8 that contains all the elements needed to ge
 
 The latest built ISO image will be made available [here](http://www.rhizomatica.org/distro/rhizobsc-latest.iso)
 
-[http://www.rhizomatica.org/distro](http://www.rhizomatica.org/distro "http://www.rhizomatica.org/distro/iso")
+[http://www.rhizomatica.org/distro/iso/](http://www.rhizomatica.org/distro/iso/ "http://www.rhizomatica.org/distro/iso/")
 
 #### Notes: ####
 
