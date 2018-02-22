@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "root:rhizomatica" | chpasswd
+echo "rhizomatica:rhizomatica" | chpasswd

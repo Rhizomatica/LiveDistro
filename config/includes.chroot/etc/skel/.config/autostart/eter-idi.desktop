@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Exec=sh "/opt/eter-idi.sh"
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=EterIdi
+Comment=Cambios según idioma
+

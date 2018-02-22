@@ -1,0 +1,19 @@
+[Default Applications]
+application/x-shellscript=leafpad.desktop
+application/x-deb=gdebi.desktop
+text/x-matlab=leafpad.desktop
+text/plain=leafpad.desktop
+application/x-iwork-keynote-sffkey=leafpad.desktop
+image/png=eom.desktop
+audio/x-vorbis+ogg=vlc.desktop
+image/jpeg=eom.desktop
+
+[Added Associations]
+application/x-shellscript=leafpad.desktop;
+application/x-deb=gdebi.desktop;
+text/x-matlab=leafpad.desktop;
+text/plain=leafpad.desktop;
+application/x-iwork-keynote-sffkey=leafpad.desktop;
+image/png=eom.desktop;
+audio/x-vorbis+ogg=vlc.desktop;
+image/jpeg=eom.desktop;

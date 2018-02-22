@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=Asistente BSC Rhizomatica
+Comment=Asistente de Configuración BSC Rhizomatica
+Exec=gksu /opt/asisbsc/setup.sh
+Icon=/usr/share/backgrounds/rhizobsc/rhizobsc-rhizomatica-fdo-negro.jpeg
+Type=Application
+Categories=System;
+StartupNotify=true
+Terminal=false

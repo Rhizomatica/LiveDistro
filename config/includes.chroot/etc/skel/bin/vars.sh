@@ -1,0 +1,32 @@
+#!/bin/sh
+RHIZO_SCRIPT="/home/rhizomatica/bin"
+
+function logc() {
+    txt=$1
+    echo "[`date '+%d-%m-%Y %H:%M:%S'`] $txt" >> $LOGFILE
+}
+
+#BTSs IP addresses
+
+<% if @bts1_ip_address -%>
+BTS1=<%= @bts1_ip_address %>
+<% end -%>
+<% if @bts2_ip_address -%>
+BTS2=<%= @bts2_ip_address %>
+<% end -%>
+<% if @bts3_ip_address -%>
+BTS3=<%= @bts3_ip_address %>
+<% end -%>
+
+RECIPIENTS="<%= @mail_admins -%>"
+
+function bname {
+    case $1 in
+        0) echo -n "<%= @bts1_name %> ONE" ;;
+        1) echo -n "<%= @bts1_name %> TWO" ;;
+        2) echo -n "<%= @bts2_name %> ONE" ;;
+        3) echo -n "<%= @bts2_name %> TWO" ;;
+        4) echo -n "<%= @bts3_name %> ONE" ;;
+        5) echo -n "<%= @bts3_name %> TWO" ;;
+    esac
+}
