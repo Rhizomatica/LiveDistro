@@ -8,16 +8,13 @@ DISBASE=$(lsb_release -d | awk '{print $2}')
 
 BUILD_DATE=`date`
 BUILD_TIMESTAMP=`date +%Y%m%d%H%M`
-#BUILD_VERSION="standart-"$BUILD_TIMESTAMP
 BUILD_VERSION=$BUILD_TIMESTAMP
 
 if [ $DISBASE = "Debian" ]
 then
-	#DISTRO="rhizobsc-BETA-0.6.1-debian"
-	DISTRO="rhizobsc-1.0-debian"
+	DISTRO="rhizobsc-1.0.1-debian"
 else
-	#DISTRO="rhizobsc-BETA-0.6.1-devuan"
-	DISTRO="rhizobsc-1.0-devuan"
+	DISTRO="rhizobsc-1.0.1-devuan"
 fi
 
 PROJECT_NAME=$DISTRO
@@ -26,6 +23,7 @@ PROJECT_NAME=$DISTRO
 echo "Versión: $BUILD_VERSION" > config/includes.binary/BUILD
 echo $BUILD_DATE >> config/includes.binary/BUILD
 cp -vf config/includes.binary/BUILD config/includes.chroot/BUILD
+sed -i "s/Menu Inicial.*/Menu Inicial - Version: $BUILD_VERSION/g" config/includes.binary/isolinux/menu.cfg
 
 lb build noauto "${@}" 2>&1 | tee build.log
 if [ -f live-image-$ARQUI.hybrid.iso -o -f live-image-$ARQUI.iso -o -f live-image-$ARQUI.img ]
