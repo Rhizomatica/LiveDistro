@@ -3,26 +3,27 @@
 set -e
 
 ## Declaración de Variables propias para Rhizomatica
-PAQUETES="/home/operador/datos/rhizomatica/rhizobsc/paquetes"
+PAQUETES="/home/rhizomatica/packages"
 DISBASE=$(lsb_release -d | awk '{print $2}')
 
 ## Declaración de Variables para live-build
 ARQUI="amd64"
-APTFORMA="aptitude"
+APTFORMA="apt"
 AREAS="main contrib non-free"
 RAMADEB="jessie"
 COMPRE="bzip2"
 SUMA="sha256"
 TASKSEL="aptitude"
 IB="iso-hybrid"
+MIRROR_BINARY="http://ftp.nl.debian.org/debian"
 
 ## Copia directorios con archivos comúnes sea DISBASE Debian o Devuan
-cp -ra $PAQUETES/archives config/
-cp -ra $PAQUETES/package-lists config/
-cp -ra $PAQUETES/packages.chroot config/
-cp -ra $PAQUETES/packages.binary-$ARQUI config/packages.binary
-cp -ra $PAQUETES/includes.installer config/
-cp -a $PAQUETES/*-rhizomatica.hook.chroot config/hooks/
+#cp -ra $PAQUETES/archives config/
+#cp -ra $PAQUETES/package-lists config/
+#cp -ra $PAQUETES/packages.chroot config/
+#cp -ra $PAQUETES/packages.binary-$ARQUI config/packages.binary
+#cp -ra $PAQUETES/includes.installer config/
+#cp -a $PAQUETES/*-rhizomatica.hook.chroot config/hooks/
 
 ## Si la imagen a construir es hdd usa syslinux sino isolinux para iso-hybrid
 if [ $IB = "hdd" ]
@@ -42,7 +43,7 @@ then
 	#cp -a $PAQUETES/debian-backports.list config/archives/
 	#cp -a $PAQUETES/debian-backports.pref config/archives/
 	echo -e "live-config-systemd" >> config/package-lists/live.list.chroot
-	MIRROR="http://ftp.debian.org/debian/"
+	MIRROR="http://ftp.nl.debian.org/debian/"
 	MIRROR_SECURITY="http://security.debian.org/"
 	mv config/includes.binary/isolinux/splash-db.png config/includes.binary/isolinux/splash.png
 else
@@ -58,7 +59,7 @@ else
 fi
 
 ## Kernel y otros paquetes...
-cp -a $PAQUETES/$ARQUI/* config/packages.chroot/
+#cp -a $PAQUETES/$ARQUI/* config/packages.chroot/
 echo -e "linux-image-amd64" > config/package-lists/kernel.list.chroot
 echo -e "linux-headers-amd64" >> config/package-lists/kernel.list.chroot
 
@@ -69,10 +70,12 @@ lb config noauto \
 	--archive-areas $AREAS \
 	--apt-recommends false \
 	--apt-source-archives false \
-	--apt-indices false \
+	--apt-indices true \
+        --apt-secure false \
 	-b $IB \
 	--backports false \
 	--cache true \
+	--cache-indices true \
 	--checksums $SUMA \
 	--compression $COMPRE \
 	--clean \
@@ -93,7 +96,7 @@ lb config noauto \
 	--mirror-bootstrap $MIRROR \
 	--mirror-chroot $MIRROR \
 	--mirror-chroot-security $MIRROR_SECURITY \
-	--mirror-binary $MIRROR \
+	--mirror-binary $MIRROR_BINARY \
 	--mirror-binary-security $MIRROR_SECURITY \
 	--mirror-debian-installer $MIRROR \
 	--parent-mirror-bootstrap $MIRROR \
