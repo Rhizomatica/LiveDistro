@@ -9,7 +9,7 @@ This is a Live ISO based on Debian 8 that contains all the elements needed to ge
 
 * Osmocom Osmo-NITB
 * Freeswitch
-* RCCN - RAI
+* RCCN - RAI (currently not included here - A Debian Package will be made available elsewhere.)
 * Browser
 
 
