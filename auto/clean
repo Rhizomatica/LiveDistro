@@ -15,36 +15,37 @@ rm -f build.log
 rm -f config/package-lists/kernel.list.chroot
 
 ## Borra directorios con archivos comúnes sea DISBASE Debian o Devuan
-if [ -d config/archives ]
-then
-	rm -rf config/archives
-fi
+if false; then
+	if [ -d config/archives ]
+	then
+		rm -rf config/archives
+	fi
 
-if [ -d config/package-lists ]
-then
-	rm -rf config/package-lists
-fi
+	if [ -d config/package-lists ]
+	then
+		rm -rf config/package-lists
+	fi
 
-if [ -d config/packages.binary ]
-then
-	rm -rf config/packages.binary
-fi
+	if [ -d config/packages.binary ]
+	then
+		rm -rf config/packages.binary
+	fi
 
-if [ -d config/packages.chroot ]
-then
-	rm -rf config/packages.chroot
-fi
+	if [ -d config/packages.chroot ]
+	then
+		rm -rf config/packages.chroot
+	fi
 
-if [ -f config/hooks/0500-rhizomatica.hook.chroot ]
-then
-	rm -rf config/hooks/*-rhizomatica.hook.chroot
-fi
+	if [ -f config/hooks/0500-rhizomatica.hook.chroot ]
+	then
+		rm -rf config/hooks/*-rhizomatica.hook.chroot
+	fi
 
-if [ -d config/includes.installer ]
-then
-	rm -rf config/includes.installer
+	if [ -d config/includes.installer ]
+	then
+		rm -rf config/includes.installer
+	fi
 fi
-
 ## Borra isolinux o syslinux
 if [ -d config/includes.binary/syslinux ]
 then
