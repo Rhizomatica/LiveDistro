@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=Rhizomatica Administration Interface
+Comment=Interfaz de Administración Rhizomatica
+Exec=/usr/bin/chromium http://localhost/rai/
+Icon=/usr/share/backgrounds/rhizobsc/rhizobsc-rhizomatica-fdo-blanco.jpeg
+Type=Application
+Categories=System;
+StartupNotify=true
+Terminal=false
