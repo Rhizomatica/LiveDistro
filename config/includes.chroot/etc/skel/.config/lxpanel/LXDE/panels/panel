@@ -115,8 +115,8 @@ Plugin {
   type=xkb
   Config {
     Model=pc105
-    LayoutsList=latam,br,es
-    VariantsList=,,
+    LayoutsList=latam,br,es,gb
+    VariantsList=,,,intl
     ToggleOpt=grp:shift_caps_toggle
     KeepSysLayouts=0
   }
