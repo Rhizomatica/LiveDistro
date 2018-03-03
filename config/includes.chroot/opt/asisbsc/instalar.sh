@@ -1,6 +1,6 @@
 #!/bin/sh
 #################################################################
-#   Script escrito por Javier De La Cruz para la configuración de la distro  de Rhizomatica
+#   Script escrito por Javier De La Cruz para la configuración de la distro de Rhizomatica
 #   Con apoyo de Javier Obregon
 #   Configuraciones:
 #   + Basicas del Sitio
@@ -76,7 +76,7 @@ else
 	(service postgresql restart) | zenity --progress title="$titulo" --text="Reiniciando PostgreSQL" --pulsate --auto-close
 fi
 (python /var/rhizomatica/rccn/install.py) | zenity --progress title="$titulo" --text="Configurando software RCCN" --pulsate --auto-close
-(su - postgres -c "psql -d rhizomatica -f $location_file ") | zenity --progress --title="$titulo" --text="Creando columna locations" --pulsate --auto-close
+#(su - postgres -c "psql -d rhizomatica -f $location_file ") | zenity --progress --title="$titulo" --text="Creando columna locations" --pulsate --auto-close
 (su - postgres -c "psql -c \"ALTER DATABASE $BD OWNER to $usuario_sistema; \" ") | zenity --progress --title="$titulo" --text="Asignando Base de datos $BD al usuario $usuario_sistema" --pulsate --auto-close
 (sv restart rapi) | zenity --progress --title="$titulo" --text="Reiniciando RAPI" --pulsate --auto-close
 
@@ -167,7 +167,7 @@ sed -i 's/arfcn 249/arfcn '$arfcnB'/' $conf_osmo)\
 | zenity --progress --title="$titulo" --text="Aplicando cambios en archivo osmo-nitb.cfg" --pulsate --auto-close
 
 ### freeswitch
-(sed -i  's/192.168.0.49/$ip/' $conf_freeswitch_vars) | zenity --progress --title="$titulo" --text="Aplicando cambios Freeswitch vars.xml" --pulsate --auto-close
+(sed -i  's/192.168.0.49/'$ip'/' $conf_freeswitch_vars) | zenity --progress --title="$titulo" --text="Aplicando cambios Freeswitch vars.xml" --pulsate --auto-close
 
 sed -i 's/DB_USER = "rhizomatica"/DB_USER = "'$usuario_sistema'"/' $conf_rai
 sed -i 's/DB_PASSWORD = "prueba"/DB_PASSWORD = "'$password_usuario_sistema'"/' $conf_rai
