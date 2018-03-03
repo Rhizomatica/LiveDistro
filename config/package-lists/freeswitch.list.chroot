@@ -1,4 +1,3 @@
-kannel
 freeswitch
 freeswitch-lang-en
 freeswitch-mod-amr
@@ -41,10 +40,4 @@ freeswitch-mod-voicemail
 freeswitch-mod-voicemail-ivr
 freeswitch-mod-xml-cdr
 freeswitch-sysvinit
-lcr
 libfreeswitch1
-openggsn
-python-corepost
-python-gsm0338
-python-python-esl
-python-python-smpplib
