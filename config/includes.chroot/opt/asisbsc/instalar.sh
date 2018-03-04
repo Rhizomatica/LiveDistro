@@ -78,8 +78,11 @@ instalar_rccn(){
 	else
 		(service apache2 restart) | zenity --progress --title="$titulo" --text="Reiniciando el servicio de  Apache" --pulsate --auto-close
 	fi
+	
 	(sv restart osmo-nitb)| zenity --progress --title="$titulo" --text="Reiniciando Osmo-nitb" --pulsate --auto-close
-
+	
+	(ln -s /etc/sv/rapi /etc/service/; sv start rapi)| zenity --progress --title="$titulo" --text="Iniciando RAPI" --pulsate --auto-close
+	
 	if [ $DISBASE = "Debian" ]
 	then
 		(systemctl restart kannel) | zenity --progress --title="$titulo" --text="Reiniciando Kannel" --pulsate --auto-close
@@ -133,23 +136,19 @@ EOF
 
 editar(){
 	### config_values.py
-	(grep -i "site_name" $conf_values | sed -i 's/DebianBSC/'$n_sitio'/' $conf_values;\
-	grep -i "network_name" $conf_values | sed -i 's/DebianGSM/'$n_gsm'/' $conf_values;\
-	grep -i "postcode" $conf_values | sed -i 's/99999/'$c_p'/' $conf_values;\
+	(sed -i 's/DebianBSC/'$n_sitio'/' $conf_values;\
+	sed -i 's/DebianGSM/'$n_gsm'/' $conf_values;\
+	sed -i 's/99999/'$c_p'/' $conf_values;\
 	sed  -i 's/pbxcode = "1"/pbxcode = "'$c_pbx'"/' $conf_values;\
-	grep -i "wan_ip_address" $conf_values | sed -i 's/192.168.0.49/'$ip'/' $conf_values;\
-	grep -i "notice_msg" $conf_values | sed -i 's/ 40 / '$cuo_rec' /' $conf_values)\
+	sed -i 's/192.168.0.49/'$ip'/' $conf_values;\
+	sed -i 's/ 40 / '$cuo_rec' /' $conf_values)\
 	| zenity --progress --title="$titulo" --text="Aplicando cambios en archivo config_values.py" --pulsate --auto-close
 
 	### osmo-nitb.cfg
-	(grep -i "short name" $conf_osmo | sed -i 's/DebianGSM/'$n_gsm'/' $conf_osmo;\
-	grep -i "long name" $conf_osmo | sed -i 's/DebianGSM/'$n_gsm'/' $conf_osmo;\
+	(sed -i 's/DebianGSM/'$n_gsm'/' $conf_osmo;\
+	sed -i 's/DebianGSM/'$n_gsm'/' $conf_osmo;\
 	sed -i 's/network country code 334/network country code '$mcc'/' $conf_osmo;\
 	sed -i 's/mobile network code 7/mobile network code '$mnc'/' $conf_osmo;\
-	if [ $tipo_red = "cerrada" ] || [ $tipo_red = "closed" ]
-	then
-		sed -i 's/auth policy accept-all/auth policy closed/' $conf_osmo
-	fi
 	sed -i 's/arfcn 246/arfcn '$arfcnA'/' $conf_osmo;\
 	sed -i 's/arfcn 249/arfcn '$arfcnB'/' $conf_osmo)\
 	| zenity --progress --title="$titulo" --text="Aplicando cambios en archivo osmo-nitb.cfg" --pulsate --auto-close
@@ -158,7 +157,7 @@ editar(){
 	(sed -i  's/192.168.0.49/'$ip'/' $conf_freeswitch_vars) | zenity --progress --title="$titulo" --text="Aplicando cambios Freeswitch vars.xml" --pulsate --auto-close
 
 	sed -i 's/DB_USER = "rhizomatica"/DB_USER = "'$usuario_sistema'"/' $conf_rai
-	sed -i 's/DB_PASSWORD = "prueba"/DB_PASSWORD = "'$password_usuario_sistema'"/' $conf_rai
+	sed -i 's/DB_PASSWORD = "TestTest"/DB_PASSWORD = "'$password_usuario_sistema'"/' $conf_rai
 
 	## config_values.py
 	sed -i "s/pgsql_user = 'rhizomatica'/pgsql_user = '"$usuario_sistema"'/" $conf_values
@@ -259,10 +258,6 @@ validacion(){
 	then
 		zenity --info --title "$titulo" --text "Por Favor ingresa la cuota de recuperación al mes por usuario"
 		return 1
-	elif [ -z $tipo_red ]
-	then
-		zenity --info --title "$titulo" --text "Por Favor ingresa el tip de red Abierta o Cerrada"
-		return 1
 	elif [ -z $usuario_sistema  ]
 	then
 		zenity --info --title="$titulo" --text="Ingresa un nombre de usuario"
@@ -322,7 +317,6 @@ formulario(){
 		--add-entry="MCC:" \
 		--add-entry="MNC:" \
 		--add-entry="Cuota de Recuperación:" \
-		--add-entry="Tipo de Red(Abierta o Cerrada):" \
 		--add-entry="Usuario:" \
 		--add-entry="Contraseña:" \
 		--add-entry="Nombre Proveedor VoIP:" \
@@ -344,7 +338,6 @@ formulario(){
 			mcc=$(echo ${var_for} |awk -F "," '{print $8}')
 			mnc=$(echo ${var_for} | awk -F "," '{print $9}')
 			cuo_rec=$(echo ${var_for} | awk -F "," '{print $10}')
-			tipo_red=$(echo ${var_for} | awk -F "," '{print $11}' | tr [:upper:] [:lower:] )
 			## Usuario Contraseña
 			usuario_sistema=$(echo ${var_for} | awk -F "," '{print $12}')
 			password_usuario_sistema=$(echo ${var_for} | awk -F "," '{print $13}')
