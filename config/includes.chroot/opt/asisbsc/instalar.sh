@@ -339,16 +339,16 @@ formulario(){
 			mnc=$(echo ${var_for} | awk -F "," '{print $9}')
 			cuo_rec=$(echo ${var_for} | awk -F "," '{print $10}')
 			## Usuario Contraseña
-			usuario_sistema=$(echo ${var_for} | awk -F "," '{print $12}')
-			password_usuario_sistema=$(echo ${var_for} | awk -F "," '{print $13}')
+			usuario_sistema=$(echo ${var_for} | awk -F "," '{print $11}')
+			password_usuario_sistema=$(echo ${var_for} | awk -F "," '{print $12}')
 			##VoIP
-			provoip_name=$(echo ${var_for} | awk -F "," '{print $14}')
-			usernamevoip=$(echo ${var_for} | awk -F "," '{print $15}')
-			fromuservoip=$(echo ${var_for} | awk -F "," '{print $16}')
-			passwordvoip=$(echo ${var_for} | awk -F "," '{print $17}')
-			proxyvoip=$(echo ${var_for} | awk -F "," '{print $18}')
-			didvoip=$(echo ${var_for} | awk -F "," '{print $19}')
-			clivoip=$(echo ${var_for} | awk -F "," '{print $20}')
+			provoip_name=$(echo ${var_for} | awk -F "," '{print $13}')
+			usernamevoip=$(echo ${var_for} | awk -F "," '{print $14}')
+			fromuservoip=$(echo ${var_for} | awk -F "," '{print $15}')
+			passwordvoip=$(echo ${var_for} | awk -F "," '{print $16}')
+			proxyvoip=$(echo ${var_for} | awk -F "," '{print $17}')
+			didvoip=$(echo ${var_for} | awk -F "," '{print $18}')
+			clivoip=$(echo ${var_for} | awk -F "," '{print $19}')
 			## Validación de datos ingresados
 			validacion
 			if [ $? -eq 0 ] ; then
